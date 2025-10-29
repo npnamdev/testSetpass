@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Express Node.js Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="min-h-screen bg-gray-100 flex items-center justify-center">
+  <div class="w-full max-w-md flex flex-col items-center justify-center">
+    <!-- Card tìm kiếm user -->
+    <div id="searchCard" class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center">
+      <h2 class="text-2xl font-bold mb-6 text-center">Tìm kiếm người dùng</h2>
+      <form id="searchForm" class="w-full flex flex-col gap-4">
+        <input type="text" id="username" placeholder="Nhập username" required
+          class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
+        <button type="submit"
+          class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition">Tìm kiếm</button>
+      </form>
+      <div class="result mt-4 text-center text-sm hidden" id="result"></div>
+    </div>
+    <!-- Card đổi mật khẩu -->
+    <div id="changePasswordSection"
+      class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center mt-8 hidden">
+      <h3 class="text-xl font-bold mb-6 text-center">Đổi mật khẩu</h3>
+      <input type="password" id="newPassword" placeholder="Mật khẩu mới" required
+        class="border border-gray-300 rounded px-4 py-2 mb-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" required
+        class="border border-gray-300 rounded px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <button id="changePasswordBtn"
+        class="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition w-full">Đổi mật
+        khẩu</button>
+      <div id="changePasswordMsg" class="mt-4 w-full text-center"></div>
+    </div>
+  </div>
+</body>
+<script>
+  const form = document.getElementById('searchForm');
+  const resultDiv = document.getElementById('result');
+  const searchCard = document.getElementById('searchCard');
+  const changePasswordSection = document.getElementById('changePasswordSection');
+  let foundUserId = null;
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    resultDiv.classList.remove('hidden');
+    resultDiv.textContent = 'Đang tìm kiếm...';
+    changePasswordSection.classList.add('hidden');
+    foundUserId = null;
+    const username = document.getElementById('username').value;
+    try {
+      const res = await fetch('/api/search-user',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        });
+      const data = await res.json();
+      if (res.ok && data.respCode === '00' && data.user && data.user._id) {
+        foundUserId = data.user._id;
+        // Ẩn card tìm kiếm, hiện card đổi mật khẩu
+        document.getElementById('searchCard').classList.add('hidden');
+        changePasswordSection.classList.remove('hidden');
+      } else {
+        resultDiv.innerHTML = '<span class="text-red-600">' + (data.msg || data.error || 'Không tìm thấy user') + '</span>';
+      }
+    } catch (err) {
+      resultDiv.innerHTML = '<span class="text-red-600">Lỗi kết nối server</span>';
+    }
+  };
+
+  document.getElementById('changePasswordBtn').onclick = async () => {
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const msgDiv = document.getElementById('changePasswordMsg');
+    msgDiv.innerHTML = '';
+    // Xóa nút đăng nhập nếu có
+    const oldLoginBtn = document.getElementById('loginBtn');
+    if (oldLoginBtn) oldLoginBtn.remove();
+    if (!newPassword || !confirmPassword) {
+      msgDiv.innerHTML = '<span class="text-red-600">Vui lòng nhập đầy đủ mật khẩu!</span>';
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      msgDiv.innerHTML = '<span class="text-red-600">Hai mật khẩu không giống nhau!</span>';
+      return;
+    }
+    if (!foundUserId) {
+      msgDiv.innerHTML = '<span class="text-red-600">Không tìm thấy userId!</span>';
+      return;
+    }
+    try {
+      const res = await fetch('/api/set-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: foundUserId, newPassword })
+      });
+      const data = await res.json();
+      if (res.ok && data.respCode === '00') {
+        msgDiv.innerHTML = '<span class="text-green-700 font-semibold">Đổi mật khẩu thành công!</span>';
+        // Hiện nút đăng nhập
+        const loginBtn = document.createElement('a');
+        loginBtn.id = 'loginBtn';
+        loginBtn.href = 'https://landingpage.hoola.vn/join/login';
+        loginBtn.target = '_blank';
+        loginBtn.className = 'mt-4 inline-block bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition';
+        loginBtn.innerText = 'Đăng nhập';
+        msgDiv.appendChild(document.createElement('br'));
+        msgDiv.appendChild(loginBtn);
+      } else {
+        let detail = '';
+        if (data.backend) {
+          detail = '<br><span class="text-xs text-gray-500">Chi tiết: ' + (typeof data.backend === 'object' ? JSON.stringify(data.backend) : data.backend) + '</span>';
+        }
+        msgDiv.innerHTML = '<span class="text-red-600">' + (data.msg || data.error || 'Đổi mật khẩu thất bại!') + '</span>' + detail;
+      }
+    } catch (err) {
+      msgDiv.innerHTML = '<span class="text-red-600">Lỗi kết nối server!</span>';
+    }
+  };
+</script>
+
+</html>
