@@ -21,6 +21,13 @@
       </form>
       <div class="result mt-4 text-center text-sm hidden" id="result"></div>
     </div>
+    <!-- Card nhập OTP -->
+    <div id="otpSection" class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center mt-8 hidden">
+      <h3 class="text-xl font-bold mb-6 text-center">Nhập mã OTP</h3>
+      <input type="text" id="otpInput" maxlength="6" placeholder="Nhập mã OTP từ SMS" required class="border border-gray-300 rounded px-4 py-2 mb-3 w-full text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <button id="otpBtn" class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition w-full">Xác nhận</button>
+      <div id="otpMsg" class="mt-4 w-full text-center"></div>
+    </div>
     <!-- Card đổi mật khẩu -->
     <div id="changePasswordSection"
       class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center mt-8 hidden">
@@ -59,12 +66,24 @@
       const data = await res.json();
       if (res.ok && data.respCode === '00' && data.user && data.user._id) {
         foundUserId = data.user._id;
-        // Ẩn card tìm kiếm, hiện card đổi mật khẩu
+        // Ẩn card tìm kiếm, hiện card nhập OTP
         document.getElementById('searchCard').classList.add('hidden');
-        changePasswordSection.classList.remove('hidden');
+        document.getElementById('otpSection').classList.remove('hidden');
       } else {
         resultDiv.innerHTML = '<span class="text-red-600">' + (data.msg || data.error || 'Không tìm thấy user') + '</span>';
       }
+  // OTP xác nhận
+  document.getElementById('otpBtn').onclick = function () {
+    const otpInput = document.getElementById('otpInput').value.trim();
+    const otpMsg = document.getElementById('otpMsg');
+    otpMsg.innerHTML = '';
+    if (otpInput === '000000') {
+      document.getElementById('otpSection').classList.add('hidden');
+      document.getElementById('changePasswordSection').classList.remove('hidden');
+    } else {
+      otpMsg.innerHTML = '<span class="text-red-600">Mã OTP không đúng!</span>';
+    }
+  };
     } catch (err) {
       resultDiv.innerHTML = '<span class="text-red-600">Lỗi kết nối server</span>';
     }
