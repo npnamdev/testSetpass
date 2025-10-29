@@ -1,3 +1,8 @@
+    <!-- Card đăng nhập thành công -->
+    <div id="loginSuccessSection" class="bg-white rounded-xl shadow-lg p-8  flex flex-col items-center hidden ">
+      <h3 class="text-xl font-bold mb-6 text-center text-green-700">Đổi mật khẩu thành công!</h3>
+      <a href="https://landingpage.hoola.vn/join/login" target="_blank" class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition">Quay lại trang đăng nhập</a>
+    </div>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,15 +22,23 @@
         <input type="text" id="username" placeholder="Nhập username" required
           class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
         <button type="submit"
-          class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition">Tìm kiếm</button>
+          class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition">Gửi OTP</button>
+        <div class="mt-2 text-xs text-gray-500 text-center">User test: <span class="font-mono">0847436094</span></div>
+        <div class="mt-1 text-xs text-blue-600 text-center">
+          Web: <a href="https://landingpage.hoola.vn/" target="_blank" class="underline hover:text-blue-800">https://landingpage.hoola.vn/</a>
+        </div>
       </form>
       <div class="result mt-4 text-center text-sm hidden" id="result"></div>
     </div>
     <!-- Card nhập OTP -->
     <div id="otpSection" class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center mt-8 hidden">
       <h3 class="text-xl font-bold mb-6 text-center">Nhập mã OTP</h3>
-      <input type="text" id="otpInput" maxlength="6" placeholder="Nhập mã OTP từ SMS" required class="border border-gray-300 rounded px-4 py-2 mb-3 w-full text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      <button id="otpBtn" class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition w-full">Xác nhận</button>
+      <input type="text" id="otpInput" maxlength="6" placeholder="Nhập mã OTP từ SMS" required
+        class="border border-gray-300 rounded px-4 py-2 mb-3 w-full text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-400" />
+      <button id="otpBtn"
+        class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition w-full">Xác
+        nhận</button>
+        <div class="mt-2 text-xs text-gray-500 text-center">OTP mặc định: <span class="font-mono">000000</span></div>
       <div id="otpMsg" class="mt-4 w-full text-center"></div>
     </div>
     <!-- Card đổi mật khẩu -->
@@ -72,18 +85,18 @@
       } else {
         resultDiv.innerHTML = '<span class="text-red-600">' + (data.msg || data.error || 'Không tìm thấy user') + '</span>';
       }
-  // OTP xác nhận
-  document.getElementById('otpBtn').onclick = function () {
-    const otpInput = document.getElementById('otpInput').value.trim();
-    const otpMsg = document.getElementById('otpMsg');
-    otpMsg.innerHTML = '';
-    if (otpInput === '000000') {
-      document.getElementById('otpSection').classList.add('hidden');
-      document.getElementById('changePasswordSection').classList.remove('hidden');
-    } else {
-      otpMsg.innerHTML = '<span class="text-red-600">Mã OTP không đúng!</span>';
-    }
-  };
+      // OTP xác nhận
+      document.getElementById('otpBtn').onclick = function () {
+        const otpInput = document.getElementById('otpInput').value.trim();
+        const otpMsg = document.getElementById('otpMsg');
+        otpMsg.innerHTML = '';
+        if (otpInput === '000000') {
+          document.getElementById('otpSection').classList.add('hidden');
+          document.getElementById('changePasswordSection').classList.remove('hidden');
+        } else {
+          otpMsg.innerHTML = '<span class="text-red-600">Mã OTP không đúng!</span>';
+        }
+      };
     } catch (err) {
       resultDiv.innerHTML = '<span class="text-red-600">Lỗi kết nối server</span>';
     }
@@ -94,9 +107,6 @@
     const confirmPassword = document.getElementById('confirmPassword').value;
     const msgDiv = document.getElementById('changePasswordMsg');
     msgDiv.innerHTML = '';
-    // Xóa nút đăng nhập nếu có
-    const oldLoginBtn = document.getElementById('loginBtn');
-    if (oldLoginBtn) oldLoginBtn.remove();
     if (!newPassword || !confirmPassword) {
       msgDiv.innerHTML = '<span class="text-red-600">Vui lòng nhập đầy đủ mật khẩu!</span>';
       return;
@@ -117,16 +127,9 @@
       });
       const data = await res.json();
       if (res.ok && data.respCode === '00') {
-        msgDiv.innerHTML = '<span class="text-green-700 font-semibold">Đổi mật khẩu thành công!</span>';
-        // Hiện nút đăng nhập
-        const loginBtn = document.createElement('a');
-        loginBtn.id = 'loginBtn';
-        loginBtn.href = 'https://landingpage.hoola.vn/join/login';
-        loginBtn.target = '_blank';
-        loginBtn.className = 'mt-4 inline-block bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition';
-        loginBtn.innerText = 'Đăng nhập';
-        msgDiv.appendChild(document.createElement('br'));
-        msgDiv.appendChild(loginBtn);
+        // Ẩn card đổi mật khẩu, hiện card đăng nhập thành công
+        document.getElementById('changePasswordSection').classList.add('hidden');
+        document.getElementById('loginSuccessSection').classList.remove('hidden');
       } else {
         let detail = '';
         if (data.backend) {
