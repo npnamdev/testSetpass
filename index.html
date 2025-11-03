@@ -124,6 +124,15 @@
         transform: translate3d(0,-2px,0);
       }
     }
+
+    .otp-input {
+      transition: all 0.3s ease;
+    }
+
+    .otp-input:focus {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    }
   </style>
 </head>
 
@@ -207,9 +216,18 @@
       <div class="space-y-4">
     
         <div class="relative">
-          <i data-lucide="key" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
-          <input type="text" id="otpInput" maxlength="6" placeholder="Nhập mã OTP 6 chữ số" required
-            class="w-full pl-12 pr-5 py-4 border border-gray-200 rounded-2xl text-center text-sm  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 bg-white/70" />
+          <div class="flex items-center justify-center mb-2">
+            <i data-lucide="key" class="w-5 h-5 text-gray-400 mr-2"></i>
+            <span class="text-sm text-gray-600">Nhập mã OTP 6 chữ số</span>
+          </div>
+          <div class="flex justify-center space-x-2" id="otpInputs">
+            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="0">
+            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="1">
+            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="2">
+            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="3">
+            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="4">
+            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="5">
+          </div>
         </div>
 
         <!-- Countdown và gửi lại OTP -->
@@ -494,8 +512,7 @@
         startResendCountdown();
         
         // Clear OTP input
-        document.getElementById('otpInput').value = '';
-        document.getElementById('otpInput').focus();
+        clearOtpInputs();
         
       } catch (error) {
         showMessage(document.getElementById('otpMsg'), 'Gửi lại OTP thất bại. Vui lòng thử lại.', 'error');
@@ -557,8 +574,8 @@
             // Bắt đầu countdown gửi lại OTP
             startResendCountdown();
             
-            // Focus vào input OTP
-            document.getElementById('otpInput').focus();
+            // Focus vào input OTP đầu tiên
+            otpInputs[0].focus();
           }, 300);
 
         } else {
@@ -594,7 +611,7 @@
 
     // OTP verification
     document.getElementById('otpBtn').onclick = function () {
-      const otpInput = document.getElementById('otpInput').value.trim();
+      const otpInput = getOtpValue();
       const otpMsg = document.getElementById('otpMsg');
       const otpBtn = this;
       const originalContent = showLoading(otpBtn, 'Đang xác thực...');
@@ -610,6 +627,11 @@
           }, 300);
         } else {
           showMessage(otpMsg, 'Mã OTP không đúng. Vui lòng thử lại.', 'error');
+          // Add error styling to inputs
+          otpInputs.forEach(input => {
+            input.classList.remove('border-yellow-300', 'border-green-300');
+            input.classList.add('border-red-300');
+          });
         }
         hideLoading(otpBtn, originalContent);
       }, 1000);
@@ -688,21 +710,78 @@
       }
     };
 
-    // Auto-format OTP input
-    document.getElementById('otpInput').addEventListener('input', function (e) {
-      this.value = this.value.replace(/\D/g, '').substring(0, 6);
+    // Auto-format OTP input (6 separate inputs)
+    const otpInputs = document.querySelectorAll('.otp-input');
+    
+    otpInputs.forEach((input, index) => {
+      // Only allow numbers
+      input.addEventListener('input', function (e) {
+        this.value = this.value.replace(/\D/g, '');
+        
+        // Auto focus to next input
+        if (this.value && index < 5) {
+          otpInputs[index + 1].focus();
+        }
+        
+        // Update visual feedback
+        updateOtpVisualFeedback();
+      });
       
-      // Add visual feedback for OTP length
-      if (this.value.length === 6) {
-        this.classList.add('border-green-300');
-        this.classList.remove('border-red-300');
-      } else if (this.value.length > 0) {
-        this.classList.add('border-yellow-300');
-        this.classList.remove('border-green-300', 'border-red-300');
-      } else {
-        this.classList.remove('border-green-300', 'border-yellow-300', 'border-red-300');
-      }
+      // Handle backspace
+      input.addEventListener('keydown', function (e) {
+        if (e.key === 'Backspace' && !this.value && index > 0) {
+          otpInputs[index - 1].focus();
+        }
+      });
+      
+      // Handle paste
+      input.addEventListener('paste', function (e) {
+        e.preventDefault();
+        const pasteData = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
+        
+        pasteData.split('').forEach((char, i) => {
+          if (otpInputs[i]) {
+            otpInputs[i].value = char;
+          }
+        });
+        
+        // Focus to the last filled input or next empty one
+        const lastIndex = Math.min(pasteData.length - 1, 5);
+        otpInputs[lastIndex].focus();
+        updateOtpVisualFeedback();
+      });
     });
+
+    // Update visual feedback for OTP inputs
+    function updateOtpVisualFeedback() {
+      const otpValue = getOtpValue();
+      
+      otpInputs.forEach((input) => {
+        input.classList.remove('border-red-300', 'border-yellow-300', 'border-green-300');
+        
+        if (input.value) {
+          if (otpValue.length === 6) {
+            input.classList.add('border-green-300');
+          } else {
+            input.classList.add('border-yellow-300');
+          }
+        }
+      });
+    }
+
+    // Get OTP value from 6 inputs
+    function getOtpValue() {
+      return Array.from(otpInputs).map(input => input.value).join('');
+    }
+
+    // Clear OTP inputs
+    function clearOtpInputs() {
+      otpInputs.forEach(input => {
+        input.value = '';
+        input.classList.remove('border-red-300', 'border-yellow-300', 'border-green-300');
+      });
+      otpInputs[0].focus();
+    }
 
     // Mask phone number for display
     function maskPhoneNumber(phone) {
