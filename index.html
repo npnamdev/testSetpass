@@ -1,146 +1,866 @@
-    <!-- Card đăng nhập thành công -->
-    <div id="loginSuccessSection" class="bg-white rounded-xl shadow-lg p-8  flex flex-col items-center hidden ">
-      <h3 class="text-xl font-bold mb-6 text-center text-green-700">Đổi mật khẩu thành công!</h3>
-      <a href="https://landingpage.hoola.vn/join/login" target="_blank" class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition">Quay lại trang đăng nhập</a>
-    </div>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Express Node.js Home</title>
+  <title>Đặt lại mật khẩu - Hoola Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      font-family: "Nunito", sans-serif;
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .slide-up {
+      animation: slideUp 0.5s ease-out;
+    }
+
+    .scale-up {
+      animation: scaleUp 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes scaleUp {
+      from {
+        opacity: 0;
+        transform: scale(0.95);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .gradient-bg {
+      background: #1616cb;
+    }
+
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .input-focus {
+      transition: all 0.3s ease;
+    }
+
+    .input-focus:focus {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-hover {
+      transition: all 0.3s ease;
+    }
+
+    .btn-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .loading {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .success-glow {
+      box-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
+    }
+
+    .animate-bounce {
+      animation: bounce 1s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 53%, 80%, 100% {
+        transform: translate3d(0,0,0);
+      }
+      40%, 43% {
+        transform: translate3d(0,-10px,0);
+      }
+      70% {
+        transform: translate3d(0,-5px,0);
+      }
+      90% {
+        transform: translate3d(0,-2px,0);
+      }
+    }
+  </style>
 </head>
 
-<body class="min-h-screen bg-gray-100 flex items-center justify-center">
-  <div class="w-full max-w-md flex flex-col items-center justify-center">
+<body class="min-h-screen gradient-bg flex items-center justify-center">
+  <div class="w-full max-w-[460px] mx-auto">
+
     <!-- Card tìm kiếm user -->
-    <div id="searchCard" class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center">
-      <h2 class="text-2xl font-bold mb-6 text-center">Tìm kiếm người dùng</h2>
-      <form id="searchForm" class="w-full flex flex-col gap-4">
-        <input type="text" id="username" placeholder="Nhập username" required
-          class="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400" />
-        <button type="submit"
-          class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition">Gửi OTP</button>
-        <div class="mt-2 text-xs text-gray-500 text-center">User test: <span class="font-mono">0847436094</span></div>
-        <div class="mt-1 text-xs text-blue-600 text-center">
-          Web: <a href="https://landingpage.hoola.vn/" target="_blank" class="underline hover:text-blue-800">https://landingpage.hoola.vn/</a>
+    <div id="searchCard" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full slide-up">
+      <div class="flex items-center justify-center mb-5">
+        <i data-lucide="key-round" class="w-6 h-6 text-blue-600 mr-3"></i>
+        <h2 class="text-xl font-bold text-gray-800">Khôi phục mật khẩu</h2>
+      </div>
+
+      <div class="text-center mb-6">
+        <p class="text-gray-600 text-sm">Nhập số điện thoại liên kết với tài khoản của bạn</p>
+        <p class="text-gray-500 text-xs mt-1">Chúng tôi sẽ gửi mã xác thực để đặt lại mật khẩu</p>
+      </div>
+
+ 
+
+      <form id="searchForm" class="space-y-4">
+        <div class="relative">
+          <i data-lucide="phone" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+          <input type="tel" id="username" placeholder="Nhập số điện thoại (VD: 0987654321)" required
+            class="w-full pl-12 pr-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 text-sm bg-white/70"
+            maxlength="15" pattern="[0-9+\-\s]*" />
+          <div id="phoneError" class="hidden mt-2 text-red-600 text-xs flex items-center space-x-1">
+            <i data-lucide="alert-circle" class="w-3 h-3"></i>
+            <span></span>
+          </div>
         </div>
+
+
+        <button type="submit" id="searchBtn"
+          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold hover:from-blue-700 hover:to-blue-800 btn-hover flex items-center justify-center space-x-2 text-sm">
+          <i data-lucide="send" class="w-5 h-5"></i>
+          <span>Gửi mã xác thực</span>
+        </button>
       </form>
-      <div class="result mt-4 text-center text-sm hidden" id="result"></div>
+
+          <!-- Thông tin bảo mật -->
+        <div class="bg-green-50 rounded-xl p-4 mt-5 border border-green-100">
+          <div class="flex items-center space-x-2">
+            <i data-lucide="shield-check" class="w-4 h-4 text-green-600"></i>
+            <span class="text-sm text-green-700 font-medium">Tài khoản test: 0847436094</span>
+          </div>
+        </div>
+
+      <!-- Thông tin hỗ trợ -->
+      <div class=" pt-4 border-t border-gray-100">
+        <p class="text-center text-gray-500 text-xs mb-3">Gặp khó khăn trong việc khôi phục?</p>
+        <div class="flex items-center justify-center space-x-4 text-xs">
+          <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
+            <i data-lucide="help-circle" class="w-3 h-3"></i>
+            <span>Hướng dẫn</span>
+          </a>
+          <span class="text-gray-300">|</span>
+          <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
+            <i data-lucide="message-circle" class="w-3 h-3"></i>
+            <span>Liên hệ hỗ trợ</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="result mt-6 text-center hidden" id="result"></div>
     </div>
+
+
     <!-- Card nhập OTP -->
-    <div id="otpSection" class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center mt-8 hidden">
-      <h3 class="text-xl font-bold mb-6 text-center">Nhập mã OTP</h3>
-      <input type="text" id="otpInput" maxlength="6" placeholder="Nhập mã OTP từ SMS" required
-        class="border border-gray-300 rounded px-4 py-2 mb-3 w-full text-center tracking-widest focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      <button id="otpBtn"
-        class="bg-blue-600 text-white rounded px-4 py-2 font-semibold hover:bg-blue-700 transition w-full">Xác
-        nhận</button>
-        <div class="mt-2 text-xs text-gray-500 text-center">OTP mặc định: <span class="font-mono">000000</span></div>
-      <div id="otpMsg" class="mt-4 w-full text-center"></div>
+    <div id="otpSection" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full mt-6 hidden scale-up">
+      <div class="flex items-center justify-center mb-5">
+        <i data-lucide="shield" class="w-6 h-6 text-blue-600 mr-3"></i>
+        <h3 class="text-xl font-bold text-gray-800">Xác thực OTP</h3>
+      </div>
+
+      <div class="text-center mb-6">
+        <p class="text-gray-600 text-sm">Mã OTP đã được gửi đến số điện thoại của bạn</p>
+        <p class="text-blue-600 text-sm font-medium mt-1" id="phoneDisplay"></p>
+      </div>
+
+      <div class="space-y-4">
+    
+        <div class="relative">
+          <i data-lucide="key" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+          <input type="text" id="otpInput" maxlength="6" placeholder="Nhập mã OTP 6 chữ số" required
+            class="w-full pl-12 pr-5 py-4 border border-gray-200 rounded-2xl text-center text-sm  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 bg-white/70" />
+        </div>
+
+        <!-- Countdown và gửi lại OTP -->
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+              <i data-lucide="clock" class="w-4 h-4 text-gray-600"></i>
+              <span class="text-sm text-gray-600">Chưa nhận được mã?</span>
+            </div>
+            <button id="resendOtpBtn" class="text-sm font-medium text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors">
+              <span id="resendText">Gửi lại OTP</span>
+              <span id="countdown" class="hidden"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Mã test -->
+        <div class="bg-green-50 rounded-xl p-2 border border-green-100">
+          <div class="flex items-center justify-center space-x-2">
+            <i data-lucide="code" class="w-4 h-4 text-green-600"></i>
+            <span class="text-sm font-medium text-green-700">Mã OTP test:</span>
+            <span class="font-mono text-green-700 bg-green-100 px-2 py-1 rounded text-lg font-bold">000000</span>
+          </div>
+        </div>
+
+        <button id="otpBtn"
+          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold btn-hover flex items-center justify-center space-x-2 text-sm">
+          <i data-lucide="check-circle" class="w-5 h-5"></i>
+          <span>Xác nhận OTP</span>
+        </button>
+      </div>
+
+      <div class="result mt-6 text-center hidden" id="otpMsg"></div>
     </div>
     <!-- Card đổi mật khẩu -->
-    <div id="changePasswordSection"
-      class="bg-white rounded-xl shadow-lg p-8 w-full flex flex-col items-center mt-8 hidden">
-      <h3 class="text-xl font-bold mb-6 text-center">Đổi mật khẩu</h3>
-      <input type="password" id="newPassword" placeholder="Mật khẩu mới" required
-        class="border border-gray-300 rounded px-4 py-2 mb-3 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" required
-        class="border border-gray-300 rounded px-4 py-2 mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-400" />
-      <button id="changePasswordBtn"
-        class="bg-green-600 text-white rounded px-4 py-2 font-semibold hover:bg-green-700 transition w-full">Đổi mật
-        khẩu</button>
-      <div id="changePasswordMsg" class="mt-4 w-full text-center"></div>
+    <div id="changePasswordSection" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full mt-6 hidden scale-up">
+      <div class="flex items-center justify-center mb-5">
+        <i data-lucide="lock" class="w-6 h-6 text-blue-600 mr-3"></i>
+        <h3 class="text-xl font-bold text-gray-800">Đặt mật khẩu mới</h3>
+      </div>
+
+      <div class="text-center mb-6">
+        <p class="text-gray-600 text-sm">Vui lòng tạo mật khẩu mạnh để bảo vệ tài khoản của bạn</p>
+      </div>
+
+      <div class="space-y-4">
+        <div class="relative">
+          <i data-lucide="key" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+          <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" required
+            class="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 bg-white/70 text-sm" />
+          <button type="button" onclick="togglePassword('newPassword')"
+            class="absolute right-4 top-1/2 transform -translate-y-1/2">
+            <i data-lucide="eye" class="w-5 h-5 text-gray-400 hover:text-gray-600"></i>
+          </button>
+        </div>
+
+        <div class="relative">
+          <i data-lucide="shield-check" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+          <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" required
+            class="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 bg-white/70 text-sm" />
+          <button type="button" onclick="togglePassword('confirmPassword')"
+            class="absolute right-4 top-1/2 transform -translate-y-1/2">
+            <i data-lucide="eye" class="w-5 h-5 text-gray-400 hover:text-gray-600"></i>
+          </button>
+        </div>
+
+
+        <!-- Thanh độ mạnh mật khẩu -->
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <div class="flex items-center space-x-3 mb-2">
+            <i data-lucide="shield" class="w-5 h-5 text-gray-600"></i>
+            <span class="text-sm font-medium text-gray-700">Độ mạnh mật khẩu:</span>
+            <span id="passwordStrength" class="text-sm font-semibold text-gray-500">Chưa nhập</span>
+          </div>
+          <div class="w-full bg-gray-200 rounded-full h-2">
+            <div id="passwordStrengthBar" class="bg-gray-300 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Lời khuyên bảo mật đơn giản -->
+        <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
+          <div class="flex items-start space-x-3">
+            <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0"></i>
+            <div class="text-sm text-yellow-800">
+              <p class="font-semibold mb-1 text-yellow-900">💡 Mẹo tạo mật khẩu:</p>
+              <p class="text-yellow-700">Sử dụng cụm từ dễ nhớ. VD: "toiyeuvietnam", "matkhau123456"</p>
+            </div>
+          </div>
+        </div>
+
+        <button id="changePasswordBtn"
+          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold btn-hover flex items-center justify-center space-x-2 text-sm">
+          <i data-lucide="save" class="w-5 h-5"></i>
+          <span>Đặt mật khẩu mới</span>
+        </button>
+      </div>
+
+      <div class="result mt-6 text-center hidden" id="changePasswordMsg"></div>
+    </div>
+
+    <!-- Card đăng nhập thành công -->
+    <div id="loginSuccessSection" class="glass-effect rounded-2xl shadow-3xl p-8 py-12 w-full mt-6 hidden scale-up">
+      <div class="text-center">
+        <!-- Icon thành công với animation -->
+        <div class="relative inline-flex items-center justify-center w-24 h-24 mb-8">
+          <div class="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
+          <div class="relative flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-lg">
+            <i data-lucide="check" class="w-10 h-10 text-white animate-bounce"></i>
+          </div>
+        </div>
+
+        <!-- Tiêu đề -->
+        <h3 class="text-3xl font-bold mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+          🎉 Thành công!
+        </h3>
+        
+        <!-- Mô tả -->
+        <p class="text-gray-600 mb-2 text-lg">Mật khẩu của bạn đã được đặt lại thành công</p>
+        <p class="text-gray-500 mb-8 text-sm">Bây giờ bạn có thể đăng nhập với mật khẩu mới</p>
+
+        <!-- Thông tin bổ sung -->
+        <div class="bg-green-50 rounded-xl p-4 mb-8 border border-green-100">
+          <div class="flex items-center justify-center space-x-2 text-green-700">
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+            <span class="text-sm font-medium">Tài khoản của bạn đã được bảo mật</span>
+          </div>
+        </div>
+
+        <!-- Nút hành động -->
+        <button id="backToLoginBtn"
+          class="inline-flex items-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl px-8 py-4 font-semibold hover:from-green-700 hover:to-emerald-700 btn-hover shadow-lg">
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          <span>Quay lại trang đăng nhập</span>
+        </button>
+
+        <!-- Thông tin hỗ trợ -->
+        <div class="mt-8 pt-6 border-t border-gray-100">
+          <p class="text-gray-500 text-sm mb-2">Cần hỗ trợ?</p>
+          <div class="flex items-center justify-center space-x-4 text-sm">
+            <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
+              <i data-lucide="help-circle" class="w-4 h-4"></i>
+              <span>Trung tâm hỗ trợ</span>
+            </a>
+            <span class="text-gray-300">|</span>
+            <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
+              <i data-lucide="phone" class="w-4 h-4"></i>
+              <span>Liên hệ</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</body>
-<script>
-  const form = document.getElementById('searchForm');
-  const resultDiv = document.getElementById('result');
-  const searchCard = document.getElementById('searchCard');
-  const changePasswordSection = document.getElementById('changePasswordSection');
-  let foundUserId = null;
-  form.onsubmit = async (e) => {
-    e.preventDefault();
-    resultDiv.classList.remove('hidden');
-    resultDiv.textContent = 'Đang tìm kiếm...';
-    changePasswordSection.classList.add('hidden');
-    foundUserId = null;
-    const username = document.getElementById('username').value;
-    try {
-      const res = await fetch('/api/search-user',
-        {
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    const form = document.getElementById('searchForm');
+    const resultDiv = document.getElementById('result');
+    const searchCard = document.getElementById('searchCard');
+    const changePasswordSection = document.getElementById('changePasswordSection');
+    let foundUserId = null;
+    let appDomain = null;
+
+    // Lấy domain từ backend khi load trang
+    async function loadConfig() {
+      try {
+        const response = await fetch('/api/config');
+        const config = await response.json();
+        appDomain = config.domain;
+      } catch (error) {
+        console.error('Failed to load config:', error);
+        appDomain = 'https://coding.hoola.vn/'; // fallback
+      }
+    }
+
+    // Load config when page loads
+    loadConfig();
+
+    // Handle back to login button
+    document.addEventListener('click', function(e) {
+      if (e.target.id === 'backToLoginBtn' || e.target.closest('#backToLoginBtn')) {
+        e.preventDefault();
+        const loginUrl = `${appDomain}join/login`;
+        window.open(loginUrl, '_blank');
+      }
+    });
+
+    // Toggle password visibility
+    function togglePassword(inputId) {
+      const input = document.getElementById(inputId);
+      const icon = input.nextElementSibling.querySelector('i');
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.setAttribute('data-lucide', 'eye-off');
+      } else {
+        input.type = 'password';
+        icon.setAttribute('data-lucide', 'eye');
+      }
+      lucide.createIcons();
+    }
+
+    // Show loading state
+    function showLoading(button, text = 'Đang xử lý...') {
+      const originalContent = button.innerHTML;
+      button.innerHTML = `
+      <div class="loading w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+      <span>${text}</span>
+    `;
+      button.disabled = true;
+      return originalContent;
+    }
+
+    // Hide loading state
+    function hideLoading(button, originalContent) {
+      button.innerHTML = originalContent;
+      button.disabled = false;
+    }
+
+    // Show message with animation
+    function showMessage(element, message, type = 'error') {
+      const colors = {
+        error: 'text-red-600 bg-red-50 border-red-200',
+        success: 'text-green-600 bg-green-50 border-green-200',
+        info: 'text-blue-600 bg-blue-50 border-blue-200'
+      };
+
+      element.innerHTML = `
+      <div class="border rounded-lg p-3 ${colors[type]} scale-up">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="${type === 'error' ? 'alert-circle' : type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4 flex-shrink-0"></i>
+          <span class="text-sm">${message}</span>
+        </div>
+      </div>
+    `;
+      element.classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    // Variables for OTP resend
+    let resendCountdown = 0;
+    let countdownInterval = null;
+    let userPhoneNumber = '';
+
+    // Start countdown for resend OTP
+    function startResendCountdown() {
+      const resendBtn = document.getElementById('resendOtpBtn');
+      const resendText = document.getElementById('resendText');
+      const countdown = document.getElementById('countdown');
+      
+      resendCountdown = 60;
+      resendBtn.disabled = true;
+      resendText.classList.add('hidden');
+      countdown.classList.remove('hidden');
+      
+      countdownInterval = setInterval(() => {
+        countdown.textContent = `Gửi lại sau ${resendCountdown}s`;
+        resendCountdown--;
+        
+        if (resendCountdown < 0) {
+          clearInterval(countdownInterval);
+          resendBtn.disabled = false;
+          resendText.classList.remove('hidden');
+          countdown.classList.add('hidden');
+        }
+      }, 1000);
+    }
+
+    // Resend OTP function
+    document.getElementById('resendOtpBtn').onclick = async function() {
+      if (resendCountdown > 0) return;
+      
+      const resendBtn = this;
+      const originalContent = showLoading(resendBtn, 'Đang gửi...');
+      
+      try {
+        // Simulate API call to resend OTP
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        showMessage(document.getElementById('otpMsg'), 'Mã OTP mới đã được gửi!', 'success');
+        startResendCountdown();
+        
+        // Clear OTP input
+        document.getElementById('otpInput').value = '';
+        document.getElementById('otpInput').focus();
+        
+      } catch (error) {
+        showMessage(document.getElementById('otpMsg'), 'Gửi lại OTP thất bại. Vui lòng thử lại.', 'error');
+      } finally {
+        hideLoading(resendBtn, originalContent);
+      }
+    };
+
+    // Form submission
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const searchBtn = document.getElementById('searchBtn');
+
+      // Lấy số điện thoại và loại bỏ khoảng trắng
+      const username = document.getElementById('username').value.trim();
+
+      // Validate số điện thoại trước khi gửi
+      if (!username) {
+        showMessage(resultDiv, 'Vui lòng nhập số điện thoại', 'error');
+        return;
+      }
+
+      if (!validatePhoneNumber(username)) {
+        showMessage(resultDiv, 'Vui lòng nhập số điện thoại hợp lệ', 'error');
+        return;
+      }
+
+      const originalContent = showLoading(searchBtn, 'Đang tìm kiếm...');
+
+      showMessage(resultDiv, 'Đang tìm kiếm người dùng...', 'info');
+      changePasswordSection.classList.add('hidden');
+      foundUserId = null;
+
+      try {
+        const res = await fetch('/api/search-user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username })
         });
-      const data = await res.json();
-      if (res.ok && data.respCode === '00' && data.user && data.user._id) {
-        foundUserId = data.user._id;
-        // Ẩn card tìm kiếm, hiện card nhập OTP
-        document.getElementById('searchCard').classList.add('hidden');
-        document.getElementById('otpSection').classList.remove('hidden');
-      } else {
-        resultDiv.innerHTML = '<span class="text-red-600">' + (data.msg || data.error || 'Không tìm thấy user') + '</span>';
-      }
-      // OTP xác nhận
-      document.getElementById('otpBtn').onclick = function () {
-        const otpInput = document.getElementById('otpInput').value.trim();
-        const otpMsg = document.getElementById('otpMsg');
-        otpMsg.innerHTML = '';
-        if (otpInput === '000000') {
-          document.getElementById('otpSection').classList.add('hidden');
-          document.getElementById('changePasswordSection').classList.remove('hidden');
-        } else {
-          otpMsg.innerHTML = '<span class="text-red-600">Mã OTP không đúng!</span>';
-        }
-      };
-    } catch (err) {
-      resultDiv.innerHTML = '<span class="text-red-600">Lỗi kết nối server</span>';
-    }
-  };
 
-  document.getElementById('changePasswordBtn').onclick = async () => {
-    const newPassword = document.getElementById('newPassword').value;
-    const confirmPassword = document.getElementById('confirmPassword').value;
-    const msgDiv = document.getElementById('changePasswordMsg');
-    msgDiv.innerHTML = '';
-    if (!newPassword || !confirmPassword) {
-      msgDiv.innerHTML = '<span class="text-red-600">Vui lòng nhập đầy đủ mật khẩu!</span>';
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      msgDiv.innerHTML = '<span class="text-red-600">Hai mật khẩu không giống nhau!</span>';
-      return;
-    }
-    if (!foundUserId) {
-      msgDiv.innerHTML = '<span class="text-red-600">Không tìm thấy userId!</span>';
-      return;
-    }
-    try {
-      const res = await fetch('/api/set-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: foundUserId, newPassword })
-      });
-      const data = await res.json();
-      if (res.ok && data.respCode === '00') {
-        // Ẩn card đổi mật khẩu, hiện card đăng nhập thành công
-        document.getElementById('changePasswordSection').classList.add('hidden');
-        document.getElementById('loginSuccessSection').classList.remove('hidden');
-      } else {
-        let detail = '';
-        if (data.backend) {
-          detail = '<br><span class="text-xs text-gray-500">Chi tiết: ' + (typeof data.backend === 'object' ? JSON.stringify(data.backend) : data.backend) + '</span>';
+        const data = await res.json();
+
+        if (res.ok && data.respCode === '00' && data.user && data.user._id) {
+          foundUserId = data.user._id;
+          userPhoneNumber = username; // Lưu số điện thoại
+          
+          // Hiển thị số điện thoại đã ẩn một phần
+          const phoneDisplay = document.getElementById('phoneDisplay');
+          const maskedPhone = maskPhoneNumber(username);
+          phoneDisplay.textContent = maskedPhone;
+
+          // Hide search card with animation
+          searchCard.style.transform = 'translateY(-20px)';
+          searchCard.style.opacity = '0';
+          setTimeout(() => {
+            searchCard.classList.add('hidden');
+            document.getElementById('otpSection').classList.remove('hidden');
+            
+            // Bắt đầu countdown gửi lại OTP
+            startResendCountdown();
+            
+            // Focus vào input OTP
+            document.getElementById('otpInput').focus();
+          }, 300);
+
+        } else {
+          // Xử lý thông báo lỗi với message tiếng Việt thân thiện
+          let errorMessage = 'Số điện thoại không tồn tại trong hệ thống';
+
+          if (data.msg) {
+            if (data.msg.toLowerCase().includes('usernotfound') ||
+              data.msg.toLowerCase().includes('user not found') ||
+              data.msg.toLowerCase().includes('không tìm thấy')) {
+              errorMessage = 'Số điện thoại không tồn tại trong hệ thống. Vui lòng kiểm tra lại.';
+            } else {
+              errorMessage = data.msg;
+            }
+          } else if (data.error) {
+            if (data.error.toLowerCase().includes('usernotfound') ||
+              data.error.toLowerCase().includes('user not found')) {
+              errorMessage = 'Số điện thoại không tồn tại trong hệ thống. Vui lòng kiểm tra lại.';
+            } else {
+              errorMessage = data.error;
+            }
+          }
+
+          showMessage(resultDiv, errorMessage, 'error');
         }
-        msgDiv.innerHTML = '<span class="text-red-600">' + (data.msg || data.error || 'Đổi mật khẩu thất bại!') + '</span>' + detail;
+      } catch (err) {
+        console.error('Network error:', err);
+        showMessage(resultDiv, 'Lỗi kết nối mạng. Vui lòng kiểm tra kết nối internet và thử lại.', 'error');
+      } finally {
+        hideLoading(searchBtn, originalContent);
       }
-    } catch (err) {
-      msgDiv.innerHTML = '<span class="text-red-600">Lỗi kết nối server!</span>';
+    };
+
+    // OTP verification
+    document.getElementById('otpBtn').onclick = function () {
+      const otpInput = document.getElementById('otpInput').value.trim();
+      const otpMsg = document.getElementById('otpMsg');
+      const otpBtn = this;
+      const originalContent = showLoading(otpBtn, 'Đang xác thực...');
+
+      setTimeout(() => {
+        if (otpInput === '000000') {
+          // Hide OTP section with animation
+          document.getElementById('otpSection').style.transform = 'translateY(-20px)';
+          document.getElementById('otpSection').style.opacity = '0';
+          setTimeout(() => {
+            document.getElementById('otpSection').classList.add('hidden');
+            document.getElementById('changePasswordSection').classList.remove('hidden');
+          }, 300);
+        } else {
+          showMessage(otpMsg, 'Mã OTP không đúng. Vui lòng thử lại.', 'error');
+        }
+        hideLoading(otpBtn, originalContent);
+      }, 1000);
+    };
+
+    // Password change
+    document.getElementById('changePasswordBtn').onclick = async () => {
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const msgDiv = document.getElementById('changePasswordMsg');
+      const changeBtn = document.getElementById('changePasswordBtn');
+
+      msgDiv.innerHTML = '';
+
+      // Validation
+      if (!newPassword || !confirmPassword) {
+        showMessage(msgDiv, 'Vui lòng nhập đầy đủ thông tin mật khẩu!', 'error');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        showMessage(msgDiv, 'Hai mật khẩu không khớp. Vui lòng kiểm tra lại.', 'error');
+        return;
+      }
+
+      // Kiểm tra độ mạnh mật khẩu
+      const strength = checkPasswordStrength(newPassword);
+      
+      if (newPassword.length < 6) {
+        showMessage(msgDiv, 'Mật khẩu phải có ít nhất 6 ký tự.', 'error');
+        return;
+      }
+
+      if (!foundUserId) {
+        showMessage(msgDiv, 'Không tìm thấy thông tin người dùng!', 'error');
+        return;
+      }
+
+      const originalContent = showLoading(changeBtn, 'Đang đặt mật khẩu...');
+
+      try {
+        const res = await fetch('/api/set-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: foundUserId, newPassword })
+        });
+
+        const data = await res.json();
+
+        if (res.ok && data.respCode === '00') {
+          // Hide change password section with animation
+          changePasswordSection.style.transform = 'translateY(-20px)';
+          changePasswordSection.style.opacity = '0';
+          setTimeout(() => {
+            changePasswordSection.classList.add('hidden');
+            const successSection = document.getElementById('loginSuccessSection');
+            successSection.classList.remove('hidden');
+            successSection.classList.add('success-glow');
+            
+            // Re-initialize icons for success section
+            setTimeout(() => {
+              lucide.createIcons();
+            }, 100);
+          }, 300);
+        } else {
+          let errorMsg = data.msg || data.error || 'Đặt mật khẩu thất bại!';
+          if (data.backend) {
+            errorMsg += ` (Chi tiết: ${typeof data.backend === 'object' ? JSON.stringify(data.backend) : data.backend})`;
+          }
+          showMessage(msgDiv, errorMsg, 'error');
+        }
+      } catch (err) {
+        showMessage(msgDiv, 'Lỗi kết nối server! Vui lòng thử lại.', 'error');
+      } finally {
+        hideLoading(changeBtn, originalContent);
+      }
+    };
+
+    // Auto-format OTP input
+    document.getElementById('otpInput').addEventListener('input', function (e) {
+      this.value = this.value.replace(/\D/g, '').substring(0, 6);
+      
+      // Add visual feedback for OTP length
+      if (this.value.length === 6) {
+        this.classList.add('border-green-300');
+        this.classList.remove('border-red-300');
+      } else if (this.value.length > 0) {
+        this.classList.add('border-yellow-300');
+        this.classList.remove('border-green-300', 'border-red-300');
+      } else {
+        this.classList.remove('border-green-300', 'border-yellow-300', 'border-red-300');
+      }
+    });
+
+    // Mask phone number for display
+    function maskPhoneNumber(phone) {
+      if (phone.length <= 4) return phone;
+      
+      if (phone.startsWith('+84')) {
+        // +84987654321 -> +84***654321
+        return phone.substring(0, 3) + '***' + phone.substring(phone.length - 6);
+      } else if (phone.startsWith('0')) {
+        // 0987654321 -> 0***654321
+        return phone.substring(0, 1) + '***' + phone.substring(phone.length - 6);
+      } else {
+        // Other formats
+        const half = Math.floor(phone.length / 2);
+        return phone.substring(0, 2) + '*'.repeat(half) + phone.substring(phone.length - 3);
+      }
     }
-  };
-</script>
+
+    // Phone number validation and formatting
+    const phoneInput = document.getElementById('username');
+    const phoneError = document.getElementById('phoneError');
+
+    // Chỉ cho phép nhập số và một số ký tự đặc biệt
+    phoneInput.addEventListener('input', function (e) {
+      // Loại bỏ tất cả ký tự không phải số, +, -, khoảng trắng
+      let value = this.value.replace(/[^0-9+\-\s]/g, '');
+
+      // Loại bỏ khoảng trắng ở đầu và cuối
+      value = value.trim();
+
+      // Giới hạn độ dài
+      if (value.length > 15) {
+        value = value.substring(0, 15);
+      }
+
+      this.value = value;
+      validatePhoneNumber(value);
+    });
+
+    // Validation số điện thoại
+    function validatePhoneNumber(phone) {
+      const phoneErrorSpan = phoneError.querySelector('span');
+
+      // Reset styles
+      phoneInput.classList.remove('border-red-300', 'border-green-300');
+      phoneError.classList.add('hidden');
+
+      if (!phone) return;
+
+      // Loại bỏ tất cả khoảng trắng và ký tự đặc biệt để kiểm tra
+      const cleanPhone = phone.replace(/[\s+\-]/g, '');
+
+      // Kiểm tra định dạng số điện thoại Việt Nam
+      const vietnamPhoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+      const internationalRegex = /^(\+84[3|5|7|8|9])[0-9]{8}$/;
+      const cleanPhoneWithPlus = phone.replace(/[\s\-]/g, '');
+
+      if (cleanPhone.length < 10) {
+        phoneInput.classList.add('border-red-300');
+        phoneErrorSpan.textContent = 'Số điện thoại phải có ít nhất 10 chữ số';
+        phoneError.classList.remove('hidden');
+        lucide.createIcons();
+        return false;
+      }
+
+      if (!vietnamPhoneRegex.test(cleanPhone) && !internationalRegex.test(cleanPhoneWithPlus)) {
+        phoneInput.classList.add('border-red-300');
+        phoneErrorSpan.textContent = 'Số điện thoại không đúng định dạng (VD: 0987654321 hoặc +84987654321)';
+        phoneError.classList.remove('hidden');
+        lucide.createIcons();
+        return false;
+      }
+
+      phoneInput.classList.add('border-green-300');
+      return true;
+    }
+
+    // Validate on blur (khi rời khỏi input)
+    phoneInput.addEventListener('blur', function () {
+      const phone = this.value.trim();
+      if (phone) {
+        validatePhoneNumber(phone);
+      }
+    });
+
+    // Real-time password validation
+    function validatePassword() {
+      const newPassword = document.getElementById('newPassword').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // Add visual feedback for password strength
+      const newPasswordInput = document.getElementById('newPassword');
+      const confirmPasswordInput = document.getElementById('confirmPassword');
+
+      // Reset styles
+      newPasswordInput.classList.remove('border-red-300', 'border-green-300', 'border-yellow-300');
+      confirmPasswordInput.classList.remove('border-red-300', 'border-green-300');
+
+      // Check password strength
+      const strength = checkPasswordStrength(newPassword);
+      updatePasswordStrengthUI(strength);
+
+      if (newPassword.length >= 6) {
+        newPasswordInput.classList.add('border-green-300');
+      } else if (newPassword.length > 0) {
+        newPasswordInput.classList.add('border-red-300');
+      }
+
+      if (confirmPassword.length > 0) {
+        if (newPassword === confirmPassword) {
+          confirmPasswordInput.classList.add('border-green-300');
+        } else {
+          confirmPasswordInput.classList.add('border-red-300');
+        }
+      }
+    }
+
+    // Check password strength
+    function checkPasswordStrength(password) {
+      let score = 0;
+      let feedback = [];
+
+      // Chỉ dựa trên độ dài mật khẩu
+      if (password.length >= 6) score = 1;
+      if (password.length >= 8) score = 2;
+      if (password.length >= 10) score = 3;
+      if (password.length >= 12) score = 4;
+      if (password.length >= 15) score = 5;
+
+      return { score, feedback };
+    }
+
+    // Update password strength UI
+    function updatePasswordStrengthUI(strength) {
+      const strengthText = document.getElementById('passwordStrength');
+      const strengthBar = document.getElementById('passwordStrengthBar');
+      
+      const levels = [
+        { text: 'Chưa nhập', color: 'text-gray-500', bgColor: 'bg-gray-300', width: '0%' },
+        { text: 'Rất yếu', color: 'text-red-600', bgColor: 'bg-red-500', width: '20%' },
+        { text: 'Yếu', color: 'text-orange-600', bgColor: 'bg-orange-500', width: '40%' },
+        { text: 'Trung bình', color: 'text-yellow-600', bgColor: 'bg-yellow-500', width: '60%' },
+        { text: 'Mạnh', color: 'text-blue-600', bgColor: 'bg-blue-500', width: '80%' },
+        { text: 'Rất mạnh', color: 'text-green-600', bgColor: 'bg-green-500', width: '100%' }
+      ];
+
+      const level = levels[strength.score] || levels[0];
+      
+      strengthText.textContent = level.text;
+      strengthText.className = `text-sm font-semibold ${level.color}`;
+      strengthBar.className = `h-2 rounded-full transition-all duration-300 ${level.bgColor}`;
+      strengthBar.style.width = level.width;
+    }
+
+    document.getElementById('newPassword').addEventListener('input', validatePassword);
+    document.getElementById('confirmPassword').addEventListener('input', validatePassword);
+  </script>
+
+</body>
 
 </html>

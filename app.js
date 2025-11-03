@@ -13,12 +13,22 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// API lấy domain
+app.get('/api/config', (req, res) => {
+    res.json({
+        domain: process.env.DOMAIN
+    });
+});
+
 // API tìm kiếm user
 app.post('/api/search-user', async (req, res) => {
     const { username } = req.body;
 
     if (!username) {
-        return res.status(400).json({ error: 'Username is required' });
+        return res.status(400).json({ 
+            error: 'Vui lòng nhập số điện thoại',
+            respCode: '01'
+        });
     }
 
     try {
@@ -28,9 +38,40 @@ app.post('/api/search-user', async (req, res) => {
                 username
             }
         });
-        res.json(response.data);
+        
+        // Kiểm tra response từ API backend
+        const data = response.data;
+        
+        // Nếu không tìm thấy user, trả về thông báo tiếng Việt
+        if (!data.user || data.respCode !== '00') {
+            return res.json({
+                respCode: '01',
+                msg: 'Số điện thoại không tồn tại trong hệ thống. Vui lòng kiểm tra lại.',
+                error: 'User not found'
+            });
+        }
+        
+        res.json(data);
     } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch user', details: error.message });
+        console.error('Search user error:', error.message);
+        
+        // Kiểm tra nếu lỗi từ API backend
+        if (error.response && error.response.data) {
+            const backendData = error.response.data;
+            if (backendData.msg && backendData.msg.toLowerCase().includes('usernotfound')) {
+                return res.json({
+                    respCode: '01',
+                    msg: 'Số điện thoại không tồn tại trong hệ thống. Vui lòng kiểm tra lại.',
+                    error: 'User not found'
+                });
+            }
+        }
+        
+        res.status(500).json({ 
+            error: 'Lỗi kết nối server. Vui lòng thử lại sau.',
+            details: error.message,
+            respCode: '99'
+        });
     }
 });
 
