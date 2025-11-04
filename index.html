@@ -213,7 +213,7 @@
   <div class="w-full max-w-[460px] mx-auto">
 
     <!-- Card tìm kiếm user -->
-    <div id="searchCard" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full slide-up liquid-glass">
+    <div id="searchCard" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full slide-up liquid-glass hidden">
       <div class="flex items-center justify-center mb-5">
         <i data-lucide="key-round" class="w-6 h-6 text-blue-600 mr-3"></i>
         <h2 class="text-xl font-bold text-gray-800">Khôi phục mật khẩu</h2>
@@ -258,8 +258,12 @@
       </div>
 
       <div class="text-center mb-6">
-        <p class="text-gray-600 text-sm">Mã OTP đã được gửi đến số điện thoại của bạn</p>
+        <p class="text-gray-600 text-sm">Mã OTP đã được gửi đến số điện thoại</p>
         <p class="text-blue-600 text-sm font-medium mt-1" id="phoneDisplay"></p>
+        <p class="text-gray-500 text-xs mt-2">
+          Nhập sai số điện thoại? 
+          <button onclick="resetToPhoneInput()" class="text-blue-600 hover:text-blue-800 underline">Nhập lại số điện thoại</button>
+        </p>
       </div>
 
       <div class="space-y-6">
@@ -428,6 +432,174 @@
     let foundUserId = null;
     let appDomain = null;
 
+    // State management for page reload protection
+    const APP_STATE = {
+      SEARCH: 'search',
+      OTP: 'otp', 
+      CHANGE_PASSWORD: 'change_password',
+      SUCCESS: 'success'
+    };
+    
+    let currentState = APP_STATE.SEARCH;
+    let sessionData = {
+      userPhone: '',
+      maskedPhone: '',
+      userId: null,
+      currentStep: APP_STATE.SEARCH
+    };
+
+    // Save state to sessionStorage
+    function saveState() {
+      sessionStorage.setItem('resetPasswordState', JSON.stringify({
+        ...sessionData,
+        currentStep: currentState,
+        timestamp: Date.now()
+      }));
+    }
+
+    // Load state from sessionStorage
+    function loadState() {
+      const saved = sessionStorage.getItem('resetPasswordState');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          // Check if session is less than 30 minutes old
+          if (Date.now() - data.timestamp < 30 * 60 * 1000) {
+            sessionData = data;
+            currentState = data.currentStep;
+            foundUserId = data.userId;
+            userPhoneNumber = data.userPhone;
+            restoreUIState();
+            return true;
+          } else {
+            // Clear expired session
+            clearState();
+          }
+        } catch (e) {
+          console.error('Failed to load state:', e);
+          clearState();
+        }
+      }
+      return false;
+    }
+
+    // Clear saved state
+    function clearState() {
+      sessionStorage.removeItem('resetPasswordState');
+      currentState = APP_STATE.SEARCH;
+      sessionData = {
+        userPhone: '',
+        maskedPhone: '',
+        userId: null,
+        currentStep: APP_STATE.SEARCH
+      };
+    }
+
+    // Restore UI to saved state
+    function restoreUIState() {
+      // Hide all cards first
+      document.getElementById('searchCard').classList.add('hidden');
+      document.getElementById('otpSection').classList.add('hidden');
+      document.getElementById('changePasswordSection').classList.add('hidden');
+      document.getElementById('loginSuccessSection').classList.add('hidden');
+
+      switch (currentState) {
+        case APP_STATE.SEARCH:
+          document.getElementById('searchCard').classList.remove('hidden');
+          if (sessionData.userPhone) {
+            document.getElementById('username').value = sessionData.userPhone;
+          }
+          break;
+          
+        case APP_STATE.OTP:
+          document.getElementById('otpSection').classList.remove('hidden');
+          if (sessionData.maskedPhone) {
+            document.getElementById('phoneDisplay').textContent = sessionData.maskedPhone;
+          }
+          startResendCountdown();
+          setTimeout(() => {
+            if (otpInputs[0]) otpInputs[0].focus();
+          }, 100);
+          break;
+          
+        case APP_STATE.CHANGE_PASSWORD:
+          document.getElementById('changePasswordSection').classList.remove('hidden');
+          break;
+          
+        case APP_STATE.SUCCESS:
+          const successSection = document.getElementById('loginSuccessSection');
+          successSection.classList.remove('hidden');
+          successSection.classList.add('success-glow');
+          setTimeout(() => {
+            lucide.createIcons();
+          }, 100);
+          break;
+      }
+    }
+
+    // Prevent page reload/close during process
+    function setupReloadProtection() {
+      // Removed reload warnings since we have state management
+      // Users can safely reload and continue from where they left off
+    }
+
+    // Initialize on page load
+    window.addEventListener('load', function() {
+      if (!loadState()) {
+        // If no saved state, show search card (default)
+        document.getElementById('searchCard').classList.remove('hidden');
+      }
+      setupReloadProtection();
+    });
+
+    // Reset to phone input (only from OTP step)
+    function resetToPhoneInput() {
+      if (currentState === APP_STATE.OTP) {
+        // Clear countdown interval
+        if (countdownInterval) {
+          clearInterval(countdownInterval);
+          countdownInterval = null;
+        }
+        
+        // Reset to search state
+        currentState = APP_STATE.SEARCH;
+        sessionData.currentStep = APP_STATE.SEARCH;
+        sessionData.userPhone = ''; // Clear phone data
+        sessionData.userId = null;
+        sessionData.maskedPhone = '';
+        foundUserId = null;
+        userPhoneNumber = '';
+        saveState();
+        
+        // Hide OTP section with animation
+        const otpSection = document.getElementById('otpSection');
+        otpSection.style.transform = 'translateY(-20px)';
+        otpSection.style.opacity = '0';
+        
+        setTimeout(() => {
+          otpSection.classList.add('hidden');
+          
+          // Reset and show search card
+          const searchCard = document.getElementById('searchCard');
+          searchCard.style.transform = 'translateY(0)';
+          searchCard.style.opacity = '1';
+          searchCard.classList.remove('hidden');
+          
+          // Clear phone input and reset button state
+          const phoneInput = document.getElementById('username');
+          phoneInput.value = '';
+          document.getElementById('searchBtn').disabled = true;
+          
+          // Clear any error messages
+          document.getElementById('result').classList.add('hidden');
+          document.getElementById('result').innerHTML = '';
+          
+          // Focus phone input
+          phoneInput.focus();
+        }, 300);
+      }
+    }
+
     // Lấy domain từ backend khi load trang
     async function loadConfig() {
       try {
@@ -447,6 +619,8 @@
     document.addEventListener('click', function (e) {
       if (e.target.id === 'backToLoginBtn' || e.target.closest('#backToLoginBtn')) {
         e.preventDefault();
+        // Clear state when going back to login
+        clearState();
         const loginUrl = `${appDomain}/join/login`;
         window.open(loginUrl, '_blank');
       }
@@ -579,7 +753,12 @@
       const originalContent = showLoading(searchBtn, 'Đang tìm kiếm...');
 
       showMessage(resultDiv, 'Đang tìm kiếm người dùng...', 'info');
-      changePasswordSection.classList.add('hidden');
+      
+      // Hide all other sections
+      document.getElementById('otpSection').classList.add('hidden');
+      document.getElementById('changePasswordSection').classList.add('hidden');
+      document.getElementById('loginSuccessSection').classList.add('hidden');
+      
       foundUserId = null;
 
       try {
@@ -595,23 +774,39 @@
           foundUserId = data.user._id;
           userPhoneNumber = username; // Lưu số điện thoại
 
+          // Update session data
+          sessionData.userPhone = username;
+          sessionData.userId = foundUserId;
+          sessionData.maskedPhone = maskPhoneNumber(username);
+          currentState = APP_STATE.OTP;
+          saveState();
+
           // Hiển thị số điện thoại đã ẩn một phần
           const phoneDisplay = document.getElementById('phoneDisplay');
-          const maskedPhone = maskPhoneNumber(username);
-          phoneDisplay.textContent = maskedPhone;
+          phoneDisplay.textContent = sessionData.maskedPhone;
 
           // Hide search card with animation
           searchCard.style.transform = 'translateY(-20px)';
           searchCard.style.opacity = '0';
           setTimeout(() => {
             searchCard.classList.add('hidden');
-            document.getElementById('otpSection').classList.remove('hidden');
+            
+            // Reset OTP section styles before showing
+            const otpSection = document.getElementById('otpSection');
+            otpSection.style.transform = 'translateY(0)';
+            otpSection.style.opacity = '1';
+            otpSection.classList.remove('hidden');
+
+            // Clear any existing OTP inputs
+            clearOtpInputs();
 
             // Bắt đầu countdown gửi lại OTP
             startResendCountdown();
 
             // Focus vào input OTP đầu tiên
-            otpInputs[0].focus();
+            setTimeout(() => {
+              if (otpInputs[0]) otpInputs[0].focus();
+            }, 100);
           }, 300);
 
         } else {
@@ -654,6 +849,10 @@
 
       setTimeout(() => {
         if (otpInput === '000000') {
+          // Update state
+          currentState = APP_STATE.CHANGE_PASSWORD;
+          saveState();
+
           // Hide OTP section with animation
           document.getElementById('otpSection').style.transform = 'translateY(-20px)';
           document.getElementById('otpSection').style.opacity = '0';
@@ -718,6 +917,10 @@
         const data = await res.json();
 
         if (res.ok && data.respCode === '00') {
+          // Update state to success
+          currentState = APP_STATE.SUCCESS;
+          saveState();
+
           // Hide change password section with animation
           changePasswordSection.style.transform = 'translateY(-20px)';
           changePasswordSection.style.opacity = '0';
