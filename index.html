@@ -64,6 +64,21 @@
       background: #1616cb;
     }
 
+    .liquid-glass {
+      position: relative;
+      border-radius: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.05) 100%);
+      backdrop-filter: blur(16px) saturate(180%) brightness(1.1);
+      -webkit-backdrop-filter: blur(16px) saturate(180%) brightness(1.1);
+      box-shadow:
+        inset 0 1px 1px rgba(255, 255, 255, 0.4),
+        inset 0 -1px 2px rgba(255, 255, 255, 0.1),
+        0 8px 40px rgba(0, 0, 0, 0.25);
+      filter: url("#liquid-refraction");
+      overflow: hidden;
+    }
+
     .glass-effect {
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
@@ -86,6 +101,19 @@
     .btn-hover:hover {
       transform: translateY(-2px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Disabled button styles */
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed !important;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    button:disabled:hover {
+      transform: none !important;
+      box-shadow: none !important;
     }
 
     .loading {
@@ -111,17 +139,26 @@
     }
 
     @keyframes bounce {
-      0%, 20%, 53%, 80%, 100% {
-        transform: translate3d(0,0,0);
+
+      0%,
+      20%,
+      53%,
+      80%,
+      100% {
+        transform: translate3d(0, 0, 0);
       }
-      40%, 43% {
-        transform: translate3d(0,-10px,0);
+
+      40%,
+      43% {
+        transform: translate3d(0, -10px, 0);
       }
+
       70% {
-        transform: translate3d(0,-5px,0);
+        transform: translate3d(0, -5px, 0);
       }
+
       90% {
-        transform: translate3d(0,-2px,0);
+        transform: translate3d(0, -2px, 0);
       }
     }
 
@@ -133,6 +170,42 @@
       transform: translateY(-2px);
       box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     }
+
+    /* Đảm bảo icon không bị ảnh hưởng khi input focus */
+    .input-container .absolute {
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .input-container input:focus~.absolute,
+    .input-container input:focus+.absolute {
+      color: rgb(156 163 175) !important;
+      /* text-gray-400 */
+    }
+
+    /* Đặc biệt cho icon trong input */
+    .input-icon {
+      color: rgb(156 163 175) !important;
+      /* text-gray-400 */
+      transition: none !important;
+    }
+
+    /* Đảm bảo icon trong label và các element khác không bị ảnh hưởng */
+    i[data-lucide] {
+      pointer-events: none;
+    }
+
+    /* Giữ nguyên màu sắc cho icon mắt */
+    .toggle-password-icon {
+      color: rgb(156 163 175);
+      /* text-gray-400 */
+      transition: color 0.2s ease;
+    }
+
+    .toggle-password-icon:hover {
+      color: rgb(75 85 99) !important;
+      /* text-gray-600 */
+    }
   </style>
 </head>
 
@@ -140,7 +213,7 @@
   <div class="w-full max-w-[460px] mx-auto">
 
     <!-- Card tìm kiếm user -->
-    <div id="searchCard" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full slide-up">
+    <div id="searchCard" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full slide-up liquid-glass">
       <div class="flex items-center justify-center mb-5">
         <i data-lucide="key-round" class="w-6 h-6 text-blue-600 mr-3"></i>
         <h2 class="text-xl font-bold text-gray-800">Khôi phục mật khẩu</h2>
@@ -151,11 +224,11 @@
         <p class="text-gray-500 text-xs mt-1">Chúng tôi sẽ gửi mã xác thực để đặt lại mật khẩu</p>
       </div>
 
- 
+
 
       <form id="searchForm" class="space-y-4">
-        <div class="relative">
-          <i data-lucide="phone" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+        <div class="relative input-container">
+          <i data-lucide="phone" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 input-icon"></i>
           <input type="tel" id="username" placeholder="Nhập số điện thoại (VD: 0987654321)" required
             class="w-full pl-12 pr-5 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 text-sm bg-white/70"
             maxlength="15" pattern="[0-9+\-\s]*" />
@@ -166,43 +239,19 @@
         </div>
 
 
-        <button type="submit" id="searchBtn"
-          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold hover:from-blue-700 hover:to-blue-800 btn-hover flex items-center justify-center space-x-2 text-sm">
+        <button type="submit" id="searchBtn" disabled
+          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold hover:from-blue-700 hover:to-blue-800 btn-hover flex items-center justify-center space-x-2 text-sm disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none">
           <i data-lucide="send" class="w-5 h-5"></i>
           <span>Gửi mã xác thực</span>
         </button>
       </form>
-
-          <!-- Thông tin bảo mật -->
-        <div class="bg-green-50 rounded-xl p-4 mt-5 border border-green-100">
-          <div class="flex items-center space-x-2">
-            <i data-lucide="shield-check" class="w-4 h-4 text-green-600"></i>
-            <span class="text-sm text-green-700 font-medium">Tài khoản test: 0847436094</span>
-          </div>
-        </div>
-
-      <!-- Thông tin hỗ trợ -->
-      <div class=" pt-4 border-t border-gray-100">
-        <p class="text-center text-gray-500 text-xs mb-3">Gặp khó khăn trong việc khôi phục?</p>
-        <div class="flex items-center justify-center space-x-4 text-xs">
-          <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
-            <i data-lucide="help-circle" class="w-3 h-3"></i>
-            <span>Hướng dẫn</span>
-          </a>
-          <span class="text-gray-300">|</span>
-          <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
-            <i data-lucide="message-circle" class="w-3 h-3"></i>
-            <span>Liên hệ hỗ trợ</span>
-          </a>
-        </div>
-      </div>
 
       <div class="result mt-6 text-center hidden" id="result"></div>
     </div>
 
 
     <!-- Card nhập OTP -->
-    <div id="otpSection" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full mt-6 hidden scale-up">
+    <div id="otpSection" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full mt-6 liquid-glass hidden scale-up">
       <div class="flex items-center justify-center mb-5">
         <i data-lucide="shield" class="w-6 h-6 text-blue-600 mr-3"></i>
         <h3 class="text-xl font-bold text-gray-800">Xác thực OTP</h3>
@@ -213,22 +262,40 @@
         <p class="text-blue-600 text-sm font-medium mt-1" id="phoneDisplay"></p>
       </div>
 
-      <div class="space-y-4">
-    
+      <div class="space-y-6">
+
         <div class="relative">
-          <div class="flex items-center justify-center mb-2">
+          <div class="flex items-center justify-center mb-4">
             <i data-lucide="key" class="w-5 h-5 text-gray-400 mr-2"></i>
             <span class="text-sm text-gray-600">Nhập mã OTP 6 chữ số</span>
           </div>
           <div class="flex justify-center space-x-2" id="otpInputs">
-            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="0">
-            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="1">
-            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="2">
-            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="3">
-            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="4">
-            <input type="text" maxlength="1" class="otp-input w-12 h-12 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70" data-index="5">
+            <input type="text" maxlength="1"
+              class="otp-input w-11 h-11 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70"
+              data-index="0">
+            <input type="text" maxlength="1"
+              class="otp-input w-11 h-11 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70"
+              data-index="1">
+            <input type="text" maxlength="1"
+              class="otp-input w-11 h-11 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70"
+              data-index="2">
+            <input type="text" maxlength="1"
+              class="otp-input w-11 h-11 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70"
+              data-index="3">
+            <input type="text" maxlength="1"
+              class="otp-input w-11 h-11 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70"
+              data-index="4">
+            <input type="text" maxlength="1"
+              class="otp-input w-11 h-11 text-center text-xl font-bold border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70"
+              data-index="5">
           </div>
         </div>
+
+        <button id="otpBtn" disabled
+          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 mt-6 font-semibold btn-hover flex items-center justify-center space-x-2 text-sm disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none">
+          <i data-lucide="check-circle" class="w-5 h-5"></i>
+          <span>Xác nhận OTP</span>
+        </button>
 
         <!-- Countdown và gửi lại OTP -->
         <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -237,33 +304,22 @@
               <i data-lucide="clock" class="w-4 h-4 text-gray-600"></i>
               <span class="text-sm text-gray-600">Chưa nhận được mã?</span>
             </div>
-            <button id="resendOtpBtn" class="text-sm font-medium text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors">
+            <button id="resendOtpBtn"
+              class="text-sm font-medium text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed transition-colors">
               <span id="resendText">Gửi lại OTP</span>
               <span id="countdown" class="hidden"></span>
             </button>
           </div>
         </div>
-
-        <!-- Mã test -->
-        <div class="bg-green-50 rounded-xl p-2 border border-green-100">
-          <div class="flex items-center justify-center space-x-2">
-            <i data-lucide="code" class="w-4 h-4 text-green-600"></i>
-            <span class="text-sm font-medium text-green-700">Mã OTP test:</span>
-            <span class="font-mono text-green-700 bg-green-100 px-2 py-1 rounded text-lg font-bold">000000</span>
-          </div>
-        </div>
-
-        <button id="otpBtn"
-          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold btn-hover flex items-center justify-center space-x-2 text-sm">
-          <i data-lucide="check-circle" class="w-5 h-5"></i>
-          <span>Xác nhận OTP</span>
-        </button>
       </div>
 
       <div class="result mt-6 text-center hidden" id="otpMsg"></div>
     </div>
+
+
     <!-- Card đổi mật khẩu -->
-    <div id="changePasswordSection" class="glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full mt-6 hidden scale-up">
+    <div id="changePasswordSection"
+      class="liquid-glass glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full mt-6 hidden scale-up">
       <div class="flex items-center justify-center mb-5">
         <i data-lucide="lock" class="w-6 h-6 text-blue-600 mr-3"></i>
         <h3 class="text-xl font-bold text-gray-800">Đặt mật khẩu mới</h3>
@@ -274,23 +330,24 @@
       </div>
 
       <div class="space-y-4">
-        <div class="relative">
-          <i data-lucide="key" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+        <div class="relative input-container">
+          <i data-lucide="key" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 input-icon"></i>
           <input type="password" id="newPassword" placeholder="Nhập mật khẩu mới" required
             class="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 bg-white/70 text-sm" />
           <button type="button" onclick="togglePassword('newPassword')"
             class="absolute right-4 top-1/2 transform -translate-y-1/2">
-            <i data-lucide="eye" class="w-5 h-5 text-gray-400 hover:text-gray-600"></i>
+            <i data-lucide="eye" class="w-5 h-5 toggle-password-icon"></i>
           </button>
         </div>
 
-        <div class="relative">
-          <i data-lucide="shield-check" class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"></i>
+        <div class="relative input-container">
+          <i data-lucide="shield-check"
+            class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 input-icon"></i>
           <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu mới" required
             class="w-full pl-12 pr-12 py-4 border border-gray-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent input-focus text-gray-700 bg-white/70 text-sm" />
           <button type="button" onclick="togglePassword('confirmPassword')"
             class="absolute right-4 top-1/2 transform -translate-y-1/2">
-            <i data-lucide="eye" class="w-5 h-5 text-gray-400 hover:text-gray-600"></i>
+            <i data-lucide="eye" class="w-5 h-5 toggle-password-icon"></i>
           </button>
         </div>
 
@@ -303,23 +360,14 @@
             <span id="passwordStrength" class="text-sm font-semibold text-gray-500">Chưa nhập</span>
           </div>
           <div class="w-full bg-gray-200 rounded-full h-2">
-            <div id="passwordStrengthBar" class="bg-gray-300 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+            <div id="passwordStrengthBar" class="bg-gray-300 h-2 rounded-full transition-all duration-300"
+              style="width: 0%"></div>
           </div>
         </div>
 
-        <!-- Lời khuyên bảo mật đơn giản -->
-        <div class="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
-          <div class="flex items-start space-x-3">
-            <i data-lucide="lightbulb" class="w-5 h-5 text-yellow-600 mt-0.5 flex-shrink-0"></i>
-            <div class="text-sm text-yellow-800">
-              <p class="font-semibold mb-1 text-yellow-900">💡 Mẹo tạo mật khẩu:</p>
-              <p class="text-yellow-700">Sử dụng cụm từ dễ nhớ. VD: "toiyeuvietnam", "matkhau123456"</p>
-            </div>
-          </div>
-        </div>
 
-        <button id="changePasswordBtn"
-          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold btn-hover flex items-center justify-center space-x-2 text-sm">
+        <button id="changePasswordBtn" disabled
+          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold btn-hover flex items-center justify-center space-x-2 text-sm disabled:bg-gray-400 disabled:cursor-not-allowed disabled:transform-none">
           <i data-lucide="save" class="w-5 h-5"></i>
           <span>Đặt mật khẩu mới</span>
         </button>
@@ -329,55 +377,43 @@
     </div>
 
     <!-- Card đăng nhập thành công -->
-    <div id="loginSuccessSection" class="glass-effect rounded-2xl shadow-3xl p-8 py-12 w-full mt-6 hidden scale-up">
+    <div id="loginSuccessSection"
+      class="liquid-glass glass-effect rounded-2xl shadow-3xl p-8 py-10 w-full mt-6 hidden scale-up">
       <div class="text-center">
         <!-- Icon thành công với animation -->
-        <div class="relative inline-flex items-center justify-center w-24 h-24 mb-8">
+        <div class="relative inline-flex items-center justify-center w-16 h-16 mb-6">
           <div class="absolute inset-0 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full animate-pulse"></div>
-          <div class="relative flex items-center justify-center w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-lg">
-            <i data-lucide="check" class="w-10 h-10 text-white animate-bounce"></i>
+          <div
+            class="relative flex items-center justify-center w-14 h-14 bg-gradient-to-r from-green-500 to-emerald-600 rounded-full shadow-lg">
+            <i data-lucide="check" class="w-6 h-6 text-white animate-bounce"></i>
           </div>
         </div>
 
         <!-- Tiêu đề -->
-        <h3 class="text-3xl font-bold mb-4 bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+        <h3 class="text-xl font-bold mb-5 text-gray-800">
           🎉 Thành công!
         </h3>
-        
+
         <!-- Mô tả -->
-        <p class="text-gray-600 mb-2 text-lg">Mật khẩu của bạn đã được đặt lại thành công</p>
-        <p class="text-gray-500 mb-8 text-sm">Bây giờ bạn có thể đăng nhập với mật khẩu mới</p>
+        <p class="text-gray-600 mb-2 text-sm">Mật khẩu của bạn đã được đặt lại thành công</p>
+        <p class="text-gray-500 mb-6 text-xs">Bây giờ bạn có thể đăng nhập với mật khẩu mới</p>
 
         <!-- Thông tin bổ sung -->
-        <div class="bg-green-50 rounded-xl p-4 mb-8 border border-green-100">
+        <div class="bg-green-50 rounded-xl p-4 mb-6 border border-green-100">
           <div class="flex items-center justify-center space-x-2 text-green-700">
-            <i data-lucide="shield-check" class="w-5 h-5"></i>
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
             <span class="text-sm font-medium">Tài khoản của bạn đã được bảo mật</span>
           </div>
         </div>
 
         <!-- Nút hành động -->
         <button id="backToLoginBtn"
-          class="inline-flex items-center space-x-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-2xl px-8 py-4 font-semibold hover:from-green-700 hover:to-emerald-700 btn-hover shadow-lg">
+          class="w-full bg-[#1616cb] text-white rounded-2xl py-4 font-semibold btn-hover flex items-center justify-center space-x-2 text-sm">
           <i data-lucide="arrow-right" class="w-5 h-5"></i>
           <span>Quay lại trang đăng nhập</span>
         </button>
 
-        <!-- Thông tin hỗ trợ -->
-        <div class="mt-8 pt-6 border-t border-gray-100">
-          <p class="text-gray-500 text-sm mb-2">Cần hỗ trợ?</p>
-          <div class="flex items-center justify-center space-x-4 text-sm">
-            <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
-              <i data-lucide="help-circle" class="w-4 h-4"></i>
-              <span>Trung tâm hỗ trợ</span>
-            </a>
-            <span class="text-gray-300">|</span>
-            <a href="#" class="text-blue-600 hover:text-blue-800 flex items-center space-x-1">
-              <i data-lucide="phone" class="w-4 h-4"></i>
-              <span>Liên hệ</span>
-            </a>
-          </div>
-        </div>
+
       </div>
     </div>
   </div>
@@ -400,7 +436,7 @@
         appDomain = config.domain;
       } catch (error) {
         console.error('Failed to load config:', error);
-        appDomain = 'https://coding.hoola.vn/'; // fallback
+        appDomain = 'https://coding.hoola.vn'; // fallback
       }
     }
 
@@ -408,10 +444,10 @@
     loadConfig();
 
     // Handle back to login button
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
       if (e.target.id === 'backToLoginBtn' || e.target.closest('#backToLoginBtn')) {
         e.preventDefault();
-        const loginUrl = `${appDomain}join/login`;
+        const loginUrl = `${appDomain}/join/login`;
         window.open(loginUrl, '_blank');
       }
     });
@@ -478,16 +514,16 @@
       const resendBtn = document.getElementById('resendOtpBtn');
       const resendText = document.getElementById('resendText');
       const countdown = document.getElementById('countdown');
-      
+
       resendCountdown = 60;
       resendBtn.disabled = true;
       resendText.classList.add('hidden');
       countdown.classList.remove('hidden');
-      
+
       countdownInterval = setInterval(() => {
         countdown.textContent = `Gửi lại sau ${resendCountdown}s`;
         resendCountdown--;
-        
+
         if (resendCountdown < 0) {
           clearInterval(countdownInterval);
           resendBtn.disabled = false;
@@ -498,22 +534,22 @@
     }
 
     // Resend OTP function
-    document.getElementById('resendOtpBtn').onclick = async function() {
+    document.getElementById('resendOtpBtn').onclick = async function () {
       if (resendCountdown > 0) return;
-      
+
       const resendBtn = this;
       const originalContent = showLoading(resendBtn, 'Đang gửi...');
-      
+
       try {
         // Simulate API call to resend OTP
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         showMessage(document.getElementById('otpMsg'), 'Mã OTP mới đã được gửi!', 'success');
         startResendCountdown();
-        
+
         // Clear OTP input
         clearOtpInputs();
-        
+
       } catch (error) {
         showMessage(document.getElementById('otpMsg'), 'Gửi lại OTP thất bại. Vui lòng thử lại.', 'error');
       } finally {
@@ -558,7 +594,7 @@
         if (res.ok && data.respCode === '00' && data.user && data.user._id) {
           foundUserId = data.user._id;
           userPhoneNumber = username; // Lưu số điện thoại
-          
+
           // Hiển thị số điện thoại đã ẩn một phần
           const phoneDisplay = document.getElementById('phoneDisplay');
           const maskedPhone = maskPhoneNumber(username);
@@ -570,10 +606,10 @@
           setTimeout(() => {
             searchCard.classList.add('hidden');
             document.getElementById('otpSection').classList.remove('hidden');
-            
+
             // Bắt đầu countdown gửi lại OTP
             startResendCountdown();
-            
+
             // Focus vào input OTP đầu tiên
             otpInputs[0].focus();
           }, 300);
@@ -659,7 +695,7 @@
 
       // Kiểm tra độ mạnh mật khẩu
       const strength = checkPasswordStrength(newPassword);
-      
+
       if (newPassword.length < 6) {
         showMessage(msgDiv, 'Mật khẩu phải có ít nhất 6 ký tự.', 'error');
         return;
@@ -690,7 +726,7 @@
             const successSection = document.getElementById('loginSuccessSection');
             successSection.classList.remove('hidden');
             successSection.classList.add('success-glow');
-            
+
             // Re-initialize icons for success section
             setTimeout(() => {
               lucide.createIcons();
@@ -712,39 +748,39 @@
 
     // Auto-format OTP input (6 separate inputs)
     const otpInputs = document.querySelectorAll('.otp-input');
-    
+
     otpInputs.forEach((input, index) => {
       // Only allow numbers
       input.addEventListener('input', function (e) {
         this.value = this.value.replace(/\D/g, '');
-        
+
         // Auto focus to next input
         if (this.value && index < 5) {
           otpInputs[index + 1].focus();
         }
-        
+
         // Update visual feedback
         updateOtpVisualFeedback();
       });
-      
+
       // Handle backspace
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Backspace' && !this.value && index > 0) {
           otpInputs[index - 1].focus();
         }
       });
-      
+
       // Handle paste
       input.addEventListener('paste', function (e) {
         e.preventDefault();
         const pasteData = e.clipboardData.getData('text').replace(/\D/g, '').substring(0, 6);
-        
+
         pasteData.split('').forEach((char, i) => {
           if (otpInputs[i]) {
             otpInputs[i].value = char;
           }
         });
-        
+
         // Focus to the last filled input or next empty one
         const lastIndex = Math.min(pasteData.length - 1, 5);
         otpInputs[lastIndex].focus();
@@ -755,10 +791,11 @@
     // Update visual feedback for OTP inputs
     function updateOtpVisualFeedback() {
       const otpValue = getOtpValue();
-      
+      const otpBtn = document.getElementById('otpBtn');
+
       otpInputs.forEach((input) => {
         input.classList.remove('border-red-300', 'border-yellow-300', 'border-green-300');
-        
+
         if (input.value) {
           if (otpValue.length === 6) {
             input.classList.add('border-green-300');
@@ -767,6 +804,9 @@
           }
         }
       });
+
+      // Enable/disable OTP button based on input length
+      otpBtn.disabled = otpValue.length !== 6;
     }
 
     // Get OTP value from 6 inputs
@@ -780,13 +820,15 @@
         input.value = '';
         input.classList.remove('border-red-300', 'border-yellow-300', 'border-green-300');
       });
+      // Disable OTP button when cleared
+      document.getElementById('otpBtn').disabled = true;
       otpInputs[0].focus();
     }
 
     // Mask phone number for display
     function maskPhoneNumber(phone) {
       if (phone.length <= 4) return phone;
-      
+
       if (phone.startsWith('+84')) {
         // +84987654321 -> +84***654321
         return phone.substring(0, 3) + '***' + phone.substring(phone.length - 6);
@@ -803,6 +845,7 @@
     // Phone number validation and formatting
     const phoneInput = document.getElementById('username');
     const phoneError = document.getElementById('phoneError');
+    const searchBtn = document.getElementById('searchBtn');
 
     // Chỉ cho phép nhập số và một số ký tự đặc biệt
     phoneInput.addEventListener('input', function (e) {
@@ -818,7 +861,10 @@
       }
 
       this.value = value;
-      validatePhoneNumber(value);
+      const isValid = validatePhoneNumber(value);
+
+      // Enable/disable search button based on phone validation
+      searchBtn.disabled = !isValid;
     });
 
     // Validation số điện thoại
@@ -863,7 +909,8 @@
     phoneInput.addEventListener('blur', function () {
       const phone = this.value.trim();
       if (phone) {
-        validatePhoneNumber(phone);
+        const isValid = validatePhoneNumber(phone);
+        searchBtn.disabled = !isValid;
       }
     });
 
@@ -871,6 +918,7 @@
     function validatePassword() {
       const newPassword = document.getElementById('newPassword').value;
       const confirmPassword = document.getElementById('confirmPassword').value;
+      const changePasswordBtn = document.getElementById('changePasswordBtn');
 
       // Add visual feedback for password strength
       const newPasswordInput = document.getElementById('newPassword');
@@ -897,6 +945,12 @@
           confirmPasswordInput.classList.add('border-red-300');
         }
       }
+
+      // Enable/disable change password button
+      const isPasswordValid = newPassword.length >= 6 &&
+        confirmPassword.length >= 6 &&
+        newPassword === confirmPassword;
+      changePasswordBtn.disabled = !isPasswordValid;
     }
 
     // Check password strength
@@ -918,7 +972,7 @@
     function updatePasswordStrengthUI(strength) {
       const strengthText = document.getElementById('passwordStrength');
       const strengthBar = document.getElementById('passwordStrengthBar');
-      
+
       const levels = [
         { text: 'Chưa nhập', color: 'text-gray-500', bgColor: 'bg-gray-300', width: '0%' },
         { text: 'Rất yếu', color: 'text-red-600', bgColor: 'bg-red-500', width: '20%' },
@@ -929,7 +983,7 @@
       ];
 
       const level = levels[strength.score] || levels[0];
-      
+
       strengthText.textContent = level.text;
       strengthText.className = `text-sm font-semibold ${level.color}`;
       strengthBar.className = `h-2 rounded-full transition-all duration-300 ${level.bgColor}`;

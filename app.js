@@ -32,7 +32,7 @@ app.post('/api/search-user', async (req, res) => {
     }
 
     try {
-        const response = await axios.get(`${process.env.DOMAIN}manage/api/users/search-user`, {
+        const response = await axios.get(`${process.env.DOMAIN}/manage/api/users/search-user`, {
             params: {
                 token: process.env.TOKEN,
                 username
@@ -89,7 +89,7 @@ app.post('/api/set-password', async (req, res) => {
 
     try {
         const response = await axios.post(
-            `${process.env.DOMAIN}manage/api/users/set-user-password`,
+            `${process.env.DOMAIN}/manage/api/users/set-user-password`,
             { userId, newPassword },
             {
                 params: {
