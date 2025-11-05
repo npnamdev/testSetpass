@@ -13,6 +13,11 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
+// Trang demo
+app.get('/demo', (req, res) => {
+    res.sendFile(path.join(__dirname, 'demo.html'));
+});
+
 // API lấy domain
 app.get('/api/config', (req, res) => {
     res.json({
@@ -21,53 +26,70 @@ app.get('/api/config', (req, res) => {
 });
 
 // API tìm kiếm user
-app.post('/api/search-user', async (req, res) => {
-    const { username } = req.body;
+app.get('/api/search-user', async (req, res) => {
+    const { username, email } = req.query;
 
-    if (!username) {
-        return res.status(400).json({ 
-            error: 'Vui lòng nhập số điện thoại',
+    // Kiểm tra có ít nhất 1 param
+    if (!username && !email) {
+        return res.status(400).json({
+            error: 'Vui lòng nhập thông tin tìm kiếm',
             respCode: '01'
         });
     }
 
     try {
+        // Tạo params cho API backend
+        const apiParams = {
+            token: process.env.TOKEN
+        };
+
+        // Thêm param tương ứng
+        if (email) {
+            apiParams.email = email;
+        }
+        if (username) {
+            apiParams.username = username;
+        }
+
+        console.log('Calling backend API with params:', apiParams);
+
         const response = await axios.get(`${process.env.DOMAIN}/manage/api/users/search-user`, {
-            params: {
-                token: process.env.TOKEN,
-                username
-            }
+            params: apiParams
         });
-        
+
+        console.log('Backend response:', response.data);
+
         // Kiểm tra response từ API backend
         const data = response.data;
-        
+
         // Nếu không tìm thấy user, trả về thông báo tiếng Việt
         if (!data.user || data.respCode !== '00') {
             return res.json({
                 respCode: '01',
-                msg: 'Số điện thoại không tồn tại trong hệ thống. Vui lòng kiểm tra lại.',
+                msg: 'Không tìm thấy tài khoản trong hệ thống. Vui lòng kiểm tra lại.',
                 error: 'User not found'
             });
         }
-        
+
         res.json(data);
     } catch (error) {
         console.error('Search user error:', error.message);
-        
+
         // Kiểm tra nếu lỗi từ API backend
         if (error.response && error.response.data) {
             const backendData = error.response.data;
+            console.log('Backend error response:', backendData);
+
             if (backendData.msg && backendData.msg.toLowerCase().includes('usernotfound')) {
                 return res.json({
                     respCode: '01',
-                    msg: 'Số điện thoại không tồn tại trong hệ thống. Vui lòng kiểm tra lại.',
+                    msg: 'Không tìm thấy tài khoản trong hệ thống. Vui lòng kiểm tra lại.',
                     error: 'User not found'
                 });
             }
         }
-        
-        res.status(500).json({ 
+
+        res.status(500).json({
             error: 'Lỗi kết nối server. Vui lòng thử lại sau.',
             details: error.message,
             respCode: '99'
